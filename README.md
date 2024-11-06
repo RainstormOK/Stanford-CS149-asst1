@@ -99,6 +99,7 @@ You will not need to make use of any other std::thread API calls in this assignm
 ![](./prog1_mandelbrot_threads/graph.png)
 
 *The speed up is not linear for `view 1`. For the three-thread datapoint, the workload is imbalanced, because `thread 1` takes more work obviously, and `thread 0 & 2` are idle in most of time. But for `view 2`, all threads are in balance, so it is almost linear.*
+
 3.  To confirm (or disprove) your hypothesis, measure the amount of time
   each thread requires to complete its work by inserting timing code at
   the beginning and end of `workerThreadStart()`. How do your measurements
@@ -241,9 +242,32 @@ shows the percentage of vector lanes that are enabled.
 
 1.  Implement a vectorized version of `clampedExpSerial` in `clampedExpVector` . Your implementation 
 should work with any combination of input array size (`N`) and vector width (`VECTOR_WIDTH`). 
+
+```
+./myexp -s 9
+CLAMPED EXPONENT (required) 
+Results matched with answer!
+****************** Printing Vector Unit Statistics *******************
+Vector Width:              4
+Total Vector Instructions: 123
+Vector Utilization:        69.1%
+Utilized Vector Lanes:     340
+Total Vector Lanes:        492
+************************ Result Verification *************************
+Passed!!!
+
+ARRAY SUM (bonus) 
+Must have N % VECTOR_WIDTH == 0 for this problem (VECTOR_WIDTH is 4)
+```
+
 2.  Run `./myexp -s 10000` and sweep the vector width from 2, 4, 8, to 16. Record the resulting vector 
 utilization. You can do this by changing the `#define VECTOR_WIDTH` value in `CS149intrin.h`. 
 Does the vector utilization increase, decrease or stay the same as `VECTOR_WIDTH` changes? Why?
+
+![](./prog2_vecintrin/graph.png)
+
+*As the vector grows, more elements need to wait when their mask value is 0.*
+
 3.  _Extra credit: (1 point)_ Implement a vectorized version of `arraySumSerial` in `arraySumVector`. Your implementation may assume that `VECTOR_WIDTH` is a factor of the input array size `N`. Whereas the serial implementation runs in `O(N)` time, your implementation should aim for runtime of `(N / VECTOR_WIDTH + VECTOR_WIDTH)` or even `(N / VECTOR_WIDTH + log2(VECTOR_WIDTH))`  You may find the `hadd` and `interleave` operations useful.
 
 ## Program 3: Parallel Fractal Generation Using ISPC (20 points) ##
