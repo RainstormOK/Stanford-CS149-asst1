@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <thread>
+#include <algorithm>
 
 #include "CycleTimer.h"
 
@@ -34,8 +35,36 @@ void workerThreadStart(WorkerArgs * const args) {
     // to compute a part of the output image.  For example, in a
     // program that uses two threads, thread 0 could compute the top
     // half of the image and thread 1 could compute the bottom half.
+    float x0 = args->x0;
+    float y0 = args->y0;
+    float x1 = args->x1;
+    float y1 = args->y1;
+    int width = args->width;
+    int height = args->height;
+    int maxIterations = args->maxIterations;
+    int numThreads = args->numThreads;
+    int threadId = args->threadId;
 
-    printf("Hello world from thread %d\n", args->threadId);
+    double minSerial = 1e30;
+    double startTime = CycleTimer::currentSeconds();
+
+    int rowsInBlockPerThread = 30;
+    int rowsInBlock = rowsInBlockPerThread * numThreads;
+    int startRow = rowsInBlockPerThread * threadId;
+
+    while (startRow < height) {
+        int totalRows = (startRow + rowsInBlockPerThread < height) ? rowsInBlockPerThread : height - startRow;
+        mandelbrotSerial(x0, y0, x1, y1, width, height, 
+                            startRow,
+                            totalRows,
+                            maxIterations,
+                            args->output);
+        startRow += rowsInBlock;
+    }
+    double endTime = CycleTimer::currentSeconds();
+    minSerial = std::min(minSerial, endTime - startTime);
+
+    printf("Hello world from thread %d\t[%.3f] ms\n", args->threadId, minSerial * 1000);
 }
 
 //

@@ -96,17 +96,119 @@ You will not need to make use of any other std::thread API calls in this assignm
   generation work accordingly (threads should get blocks of the image). Note that the processor only has four cores but each
   core supports two hyper-threads, so it can execute a total of eight threads interleaved on its execution contents.
   In your write-up, produce a graph of __speedup compared to the reference sequential implementation__ as a function of the number of threads used __FOR VIEW 1__. Is speedup linear in the number of threads used? In your writeup hypothesize why this is (or is not) the case? (you may also wish to produce a graph for VIEW 2 to help you come up with a good answer. Hint: take a careful look at the three-thread datapoint.)
+![](./prog1_mandelbrot_threads/graph.png)
+
+*The speed up is not linear for `view 1`. For the three-thread datapoint, the workload is imbalanced, because `thread 1` takes more work obviously, and `thread 0 & 2` are idle in most of time. But for `view 2`, all threads are in balance, so it is almost linear.*
 3.  To confirm (or disprove) your hypothesis, measure the amount of time
   each thread requires to complete its work by inserting timing code at
   the beginning and end of `workerThreadStart()`. How do your measurements
   explain the speedup graph you previously created?
+```
+./mandelbrot --threads 3
+[mandelbrot serial]:            [339.274] ms
+Wrote image file mandelbrot-serial.ppm
+Hello world from thread 2       [70.698] ms
+Hello world from thread 0       [72.013] ms
+Hello world from thread 1       [215.013] ms
+Hello world from thread 2       [68.911] ms
+Hello world from thread 0       [69.114] ms
+Hello world from thread 1       [213.111] ms
+Hello world from thread 0       [68.726] ms
+Hello world from thread 2       [72.004] ms
+Hello world from thread 1       [213.370] ms
+Hello world from thread 2       [69.082] ms
+Hello world from thread 0       [69.254] ms
+Hello world from thread 1       [229.263] ms
+Hello world from thread 2       [68.799] ms
+Hello world from thread 0       [73.431] ms
+Hello world from thread 1       [213.483] ms
+[mandelbrot thread]:            [213.253] ms
+Wrote image file mandelbrot-thread.ppm
+                                (1.59x speedup from 3 threads)
+```
+*It's obvious that `thread 1` takes more time than the other 2 threads.*
+```
+./mandelbrot --threads 3 --view 2
+[mandelbrot serial]:            [194.972] ms
+Wrote image file mandelbrot-serial.ppm
+Hello world from thread 2       [54.502] ms
+Hello world from thread 1       [60.214] ms
+Hello world from thread 0       [95.059] ms
+Hello world from thread 2       [58.533] ms
+Hello world from thread 1       [65.606] ms
+Hello world from thread 0       [99.752] ms
+Hello world from thread 2       [60.508] ms
+Hello world from thread 1       [64.312] ms
+Hello world from thread 0       [89.933] ms
+Hello world from thread 2       [53.850] ms
+Hello world from thread 1       [58.673] ms
+Hello world from thread 0       [94.061] ms
+Hello world from thread 2       [52.024] ms
+Hello world from thread 1       [55.990] ms
+Hello world from thread 0       [92.352] ms
+[mandelbrot thread]:            [90.187] ms
+Wrote image file mandelbrot-thread.ppm
+                                (2.16x speedup from 3 threads)
+```
+*It seems more balanced for `view 2`.*
+
 4.  Modify the mapping of work to threads to achieve to improve speedup to
   at __about 7-8x on both views__ of the Mandelbrot set (if you're above 7x that's fine, don't sweat it). You may not use any
   synchronization between threads in your solution. We are expecting you to come up with a single work decomposition policy that will work well for all thread counts---hard coding a solution specific to each configuration is not allowed! (Hint: There is a very simple static
   assignment that will achieve this goal, and no communication/synchronization
   among threads is necessary.). In your writeup, describe your approach to parallelization
   and report the final 8-thread speedup obtained. 
+```
+./mandelbrot --threads 8
+[mandelbrot serial]:            [347.100] ms
+Wrote image file mandelbrot-serial.ppm
+Hello world from thread 2       [55.821] ms
+Hello world from thread 5       [55.756] ms
+Hello world from thread 4       [56.420] ms
+Hello world from thread 1       [57.328] ms
+Hello world from thread 6       [55.535] ms
+Hello world from thread 7       [56.169] ms
+Hello world from thread 0       [57.718] ms
+Hello world from thread 3       [54.594] ms
+Hello world from thread 2       [47.571] ms
+Hello world from thread 4       [47.779] ms
+Hello world from thread 0       [51.000] ms
+Hello world from thread 1       [51.690] ms
+Hello world from thread 3       [51.941] ms
+Hello world from thread 5       [52.808] ms
+Hello world from thread 7       [53.385] ms
+Hello world from thread 6       [55.143] ms
+Hello world from thread 0       [48.853] ms
+Hello world from thread 4       [48.961] ms
+Hello world from thread 3       [50.212] ms
+Hello world from thread 1       [51.108] ms
+Hello world from thread 7       [52.638] ms
+Hello world from thread 2       [52.719] ms
+Hello world from thread 5       [54.381] ms
+Hello world from thread 6       [54.382] ms
+Hello world from thread 0       [49.109] ms
+Hello world from thread 5       [49.701] ms
+Hello world from thread 3       [50.639] ms
+Hello world from thread 1       [52.146] ms
+Hello world from thread 2       [52.305] ms
+Hello world from thread 7       [53.482] ms
+Hello world from thread 6       [56.118] ms
+Hello world from thread 4       [57.056] ms
+Hello world from thread 1       [48.591] ms
+Hello world from thread 4       [50.062] ms
+Hello world from thread 3       [50.224] ms
+Hello world from thread 0       [51.544] ms
+Hello world from thread 5       [51.859] ms
+Hello world from thread 6       [52.114] ms
+Hello world from thread 2       [52.313] ms
+Hello world from thread 7       [54.737] ms
+[mandelbrot thread]:            [54.707] ms
+Wrote image file mandelbrot-thread.ppm
+                                (6.34x speedup from 8 threads)
+```
 5. Now run your improved code with 16 threads. Is performance noticably greater than when running with eight threads? Why or why not? 
+
+*No. Because there are only 8 threads that can run simutaneously. The rest threads must wait.*
   
 ## Program 2: Vectorizing Code Using SIMD Intrinsics (20 points) ##
 
