@@ -96,62 +96,64 @@ You will not need to make use of any other std::thread API calls in this assignm
   generation work accordingly (threads should get blocks of the image). Note that the processor only has four cores but each
   core supports two hyper-threads, so it can execute a total of eight threads interleaved on its execution contents.
   In your write-up, produce a graph of __speedup compared to the reference sequential implementation__ as a function of the number of threads used __FOR VIEW 1__. Is speedup linear in the number of threads used? In your writeup hypothesize why this is (or is not) the case? (you may also wish to produce a graph for VIEW 2 to help you come up with a good answer. Hint: take a careful look at the three-thread datapoint.)
-![](./prog1_mandelbrot_threads/graph.png)
 
-*The speed up is not linear for `view 1`. For the three-thread datapoint, the workload is imbalanced, because `thread 1` takes more work obviously, and `thread 0 & 2` are idle in most of time. But for `view 2`, all threads are in balance, so it is almost linear.*
+    ![](./prog1_mandelbrot_threads/graph.png)
+
+    *The speed up is not linear for `view 1`. For the three-thread datapoint, the workload is imbalanced, because `thread 1` takes more work obviously, and `thread 0 & 2` are idle in most of time. But for `view 2`, all threads are in balance, so it is almost linear.*
 
 3.  To confirm (or disprove) your hypothesis, measure the amount of time
   each thread requires to complete its work by inserting timing code at
   the beginning and end of `workerThreadStart()`. How do your measurements
   explain the speedup graph you previously created?
-```
-./mandelbrot --threads 3
-[mandelbrot serial]:            [339.274] ms
-Wrote image file mandelbrot-serial.ppm
-Hello world from thread 2       [70.698] ms
-Hello world from thread 0       [72.013] ms
-Hello world from thread 1       [215.013] ms
-Hello world from thread 2       [68.911] ms
-Hello world from thread 0       [69.114] ms
-Hello world from thread 1       [213.111] ms
-Hello world from thread 0       [68.726] ms
-Hello world from thread 2       [72.004] ms
-Hello world from thread 1       [213.370] ms
-Hello world from thread 2       [69.082] ms
-Hello world from thread 0       [69.254] ms
-Hello world from thread 1       [229.263] ms
-Hello world from thread 2       [68.799] ms
-Hello world from thread 0       [73.431] ms
-Hello world from thread 1       [213.483] ms
-[mandelbrot thread]:            [213.253] ms
-Wrote image file mandelbrot-thread.ppm
-                                (1.59x speedup from 3 threads)
-```
-*It's obvious that `thread 1` takes more time than the other 2 threads.*
-```
-./mandelbrot --threads 3 --view 2
-[mandelbrot serial]:            [194.972] ms
-Wrote image file mandelbrot-serial.ppm
-Hello world from thread 2       [54.502] ms
-Hello world from thread 1       [60.214] ms
-Hello world from thread 0       [95.059] ms
-Hello world from thread 2       [58.533] ms
-Hello world from thread 1       [65.606] ms
-Hello world from thread 0       [99.752] ms
-Hello world from thread 2       [60.508] ms
-Hello world from thread 1       [64.312] ms
-Hello world from thread 0       [89.933] ms
-Hello world from thread 2       [53.850] ms
-Hello world from thread 1       [58.673] ms
-Hello world from thread 0       [94.061] ms
-Hello world from thread 2       [52.024] ms
-Hello world from thread 1       [55.990] ms
-Hello world from thread 0       [92.352] ms
-[mandelbrot thread]:            [90.187] ms
-Wrote image file mandelbrot-thread.ppm
-                                (2.16x speedup from 3 threads)
-```
-*It seems more balanced for `view 2`.*
+
+    ```
+    ./mandelbrot --threads 3
+    [mandelbrot serial]:            [339.274] ms
+    Wrote image file mandelbrot-serial.ppm
+    Hello world from thread 2       [70.698] ms
+    Hello world from thread 0       [72.013] ms
+    Hello world from thread 1       [215.013] ms
+    Hello world from thread 2       [68.911] ms
+    Hello world from thread 0       [69.114] ms
+    Hello world from thread 1       [213.111] ms
+    Hello world from thread 0       [68.726] ms
+    Hello world from thread 2       [72.004] ms
+    Hello world from thread 1       [213.370] ms
+    Hello world from thread 2       [69.082] ms
+    Hello world from thread 0       [69.254] ms
+    Hello world from thread 1       [229.263] ms
+    Hello world from thread 2       [68.799] ms
+    Hello world from thread 0       [73.431] ms
+    Hello world from thread 1       [213.483] ms
+    [mandelbrot thread]:            [213.253] ms
+    Wrote image file mandelbrot-thread.ppm
+                                    (1.59x speedup from 3 threads)
+    ```
+    *It's obvious that `thread 1` takes more time than the other 2 threads.*
+    ```
+    ./mandelbrot --threads 3 --view 2
+    [mandelbrot serial]:            [194.972] ms
+    Wrote image file mandelbrot-serial.ppm
+    Hello world from thread 2       [54.502] ms
+    Hello world from thread 1       [60.214] ms
+    Hello world from thread 0       [95.059] ms
+    Hello world from thread 2       [58.533] ms
+    Hello world from thread 1       [65.606] ms
+    Hello world from thread 0       [99.752] ms
+    Hello world from thread 2       [60.508] ms
+    Hello world from thread 1       [64.312] ms
+    Hello world from thread 0       [89.933] ms
+    Hello world from thread 2       [53.850] ms
+    Hello world from thread 1       [58.673] ms
+    Hello world from thread 0       [94.061] ms
+    Hello world from thread 2       [52.024] ms
+    Hello world from thread 1       [55.990] ms
+    Hello world from thread 0       [92.352] ms
+    [mandelbrot thread]:            [90.187] ms
+    Wrote image file mandelbrot-thread.ppm
+                                    (2.16x speedup from 3 threads)
+    ```
+    *It seems more balanced for `view 2`.*
 
 4.  Modify the mapping of work to threads to achieve to improve speedup to
   at __about 7-8x on both views__ of the Mandelbrot set (if you're above 7x that's fine, don't sweat it). You may not use any
@@ -159,57 +161,57 @@ Wrote image file mandelbrot-thread.ppm
   assignment that will achieve this goal, and no communication/synchronization
   among threads is necessary.). In your writeup, describe your approach to parallelization
   and report the final 8-thread speedup obtained. 
-```
-./mandelbrot --threads 8
-[mandelbrot serial]:            [347.100] ms
-Wrote image file mandelbrot-serial.ppm
-Hello world from thread 2       [55.821] ms
-Hello world from thread 5       [55.756] ms
-Hello world from thread 4       [56.420] ms
-Hello world from thread 1       [57.328] ms
-Hello world from thread 6       [55.535] ms
-Hello world from thread 7       [56.169] ms
-Hello world from thread 0       [57.718] ms
-Hello world from thread 3       [54.594] ms
-Hello world from thread 2       [47.571] ms
-Hello world from thread 4       [47.779] ms
-Hello world from thread 0       [51.000] ms
-Hello world from thread 1       [51.690] ms
-Hello world from thread 3       [51.941] ms
-Hello world from thread 5       [52.808] ms
-Hello world from thread 7       [53.385] ms
-Hello world from thread 6       [55.143] ms
-Hello world from thread 0       [48.853] ms
-Hello world from thread 4       [48.961] ms
-Hello world from thread 3       [50.212] ms
-Hello world from thread 1       [51.108] ms
-Hello world from thread 7       [52.638] ms
-Hello world from thread 2       [52.719] ms
-Hello world from thread 5       [54.381] ms
-Hello world from thread 6       [54.382] ms
-Hello world from thread 0       [49.109] ms
-Hello world from thread 5       [49.701] ms
-Hello world from thread 3       [50.639] ms
-Hello world from thread 1       [52.146] ms
-Hello world from thread 2       [52.305] ms
-Hello world from thread 7       [53.482] ms
-Hello world from thread 6       [56.118] ms
-Hello world from thread 4       [57.056] ms
-Hello world from thread 1       [48.591] ms
-Hello world from thread 4       [50.062] ms
-Hello world from thread 3       [50.224] ms
-Hello world from thread 0       [51.544] ms
-Hello world from thread 5       [51.859] ms
-Hello world from thread 6       [52.114] ms
-Hello world from thread 2       [52.313] ms
-Hello world from thread 7       [54.737] ms
-[mandelbrot thread]:            [54.707] ms
-Wrote image file mandelbrot-thread.ppm
-                                (6.34x speedup from 8 threads)
-```
+    ```
+    ./mandelbrot --threads 8
+    [mandelbrot serial]:            [347.100] ms
+    Wrote image file mandelbrot-serial.ppm
+    Hello world from thread 2       [55.821] ms
+    Hello world from thread 5       [55.756] ms
+    Hello world from thread 4       [56.420] ms
+    Hello world from thread 1       [57.328] ms
+    Hello world from thread 6       [55.535] ms
+    Hello world from thread 7       [56.169] ms
+    Hello world from thread 0       [57.718] ms
+    Hello world from thread 3       [54.594] ms
+    Hello world from thread 2       [47.571] ms
+    Hello world from thread 4       [47.779] ms
+    Hello world from thread 0       [51.000] ms
+    Hello world from thread 1       [51.690] ms
+    Hello world from thread 3       [51.941] ms
+    Hello world from thread 5       [52.808] ms
+    Hello world from thread 7       [53.385] ms
+    Hello world from thread 6       [55.143] ms
+    Hello world from thread 0       [48.853] ms
+    Hello world from thread 4       [48.961] ms
+    Hello world from thread 3       [50.212] ms
+    Hello world from thread 1       [51.108] ms
+    Hello world from thread 7       [52.638] ms
+    Hello world from thread 2       [52.719] ms
+    Hello world from thread 5       [54.381] ms
+    Hello world from thread 6       [54.382] ms
+    Hello world from thread 0       [49.109] ms
+    Hello world from thread 5       [49.701] ms
+    Hello world from thread 3       [50.639] ms
+    Hello world from thread 1       [52.146] ms
+    Hello world from thread 2       [52.305] ms
+    Hello world from thread 7       [53.482] ms
+    Hello world from thread 6       [56.118] ms
+    Hello world from thread 4       [57.056] ms
+    Hello world from thread 1       [48.591] ms
+    Hello world from thread 4       [50.062] ms
+    Hello world from thread 3       [50.224] ms
+    Hello world from thread 0       [51.544] ms
+    Hello world from thread 5       [51.859] ms
+    Hello world from thread 6       [52.114] ms
+    Hello world from thread 2       [52.313] ms
+    Hello world from thread 7       [54.737] ms
+    [mandelbrot thread]:            [54.707] ms
+    Wrote image file mandelbrot-thread.ppm
+                                    (6.34x speedup from 8 threads)
+    ```
 5. Now run your improved code with 16 threads. Is performance noticably greater than when running with eight threads? Why or why not? 
 
-*No. Because there are only 8 threads that can run simutaneously. The rest threads must wait.*
+    *No. Because there are only 8 threads that can run simutaneously. The rest threads must wait.*
   
 ## Program 2: Vectorizing Code Using SIMD Intrinsics (20 points) ##
 
@@ -243,30 +245,30 @@ shows the percentage of vector lanes that are enabled.
 1.  Implement a vectorized version of `clampedExpSerial` in `clampedExpVector` . Your implementation 
 should work with any combination of input array size (`N`) and vector width (`VECTOR_WIDTH`). 
 
-```
-./myexp -s 9
-CLAMPED EXPONENT (required) 
-Results matched with answer!
-****************** Printing Vector Unit Statistics *******************
-Vector Width:              4
-Total Vector Instructions: 123
-Vector Utilization:        69.1%
-Utilized Vector Lanes:     340
-Total Vector Lanes:        492
-************************ Result Verification *************************
-Passed!!!
+    ```
+    ./myexp -s 9
+    CLAMPED EXPONENT (required) 
+    Results matched with answer!
+    ****************** Printing Vector Unit Statistics *******************
+    Vector Width:              4
+    Total Vector Instructions: 123
+    Vector Utilization:        69.1%
+    Utilized Vector Lanes:     340
+    Total Vector Lanes:        492
+    ************************ Result Verification *************************
+    Passed!!!
 
-ARRAY SUM (bonus) 
-Must have N % VECTOR_WIDTH == 0 for this problem (VECTOR_WIDTH is 4)
-```
+    ARRAY SUM (bonus) 
+    Must have N % VECTOR_WIDTH == 0 for this problem (VECTOR_WIDTH is 4)
+    ```
 
 2.  Run `./myexp -s 10000` and sweep the vector width from 2, 4, 8, to 16. Record the resulting vector 
 utilization. You can do this by changing the `#define VECTOR_WIDTH` value in `CS149intrin.h`. 
 Does the vector utilization increase, decrease or stay the same as `VECTOR_WIDTH` changes? Why?
 
-![](./prog2_vecintrin/graph.png)
+    ![](./prog2_vecintrin/graph.png)
 
-*As the vector grows, more elements need to wait when their mask value is 0.*
+    *As the vector grows, more elements need to wait when their mask value is 0.*
 
 3.  _Extra credit: (1 point)_ Implement a vectorized version of `arraySumSerial` in `arraySumVector`. Your implementation may assume that `VECTOR_WIDTH` is a factor of the input array size `N`. Whereas the serial implementation runs in `O(N)` time, your implementation should aim for runtime of `(N / VECTOR_WIDTH + VECTOR_WIDTH)` or even `(N / VECTOR_WIDTH + log2(VECTOR_WIDTH))`  You may find the `hadd` and `interleave` operations useful.
 
@@ -394,25 +396,25 @@ the foreach loop to yield a more straightforward implementation.
   execution? Comparing the performance of rendering the different views
   of the Mandelbrot set may help confirm your hypothesis.).  
 
-```
-./mandelbrot_ispc --view 1
-[mandelbrot serial]:            [617.504] ms
-Wrote image file mandelbrot-serial.ppm
-[mandelbrot ispc]:              [175.256] ms
-Wrote image file mandelbrot-ispc.ppm
-                                (3.52x speedup from ISPC)
-```
+    ```
+    ./mandelbrot_ispc --view 1
+    [mandelbrot serial]:            [617.504] ms
+    Wrote image file mandelbrot-serial.ppm
+    [mandelbrot ispc]:              [175.256] ms
+    Wrote image file mandelbrot-ispc.ppm
+                                    (3.52x speedup from ISPC)
+    ```
 
-```
-./mandelbrot_ispc --view 2
-[mandelbrot serial]:            [141.241] ms
-Wrote image file mandelbrot-serial.ppm
-[mandelbrot ispc]:              [48.720] ms
-Wrote image file mandelbrot-ispc.ppm
-                                (2.90x speedup from ISPC)
-```
+    ```
+    ./mandelbrot_ispc --view 2
+    [mandelbrot serial]:            [141.241] ms
+    Wrote image file mandelbrot-serial.ppm
+    [mandelbrot ispc]:              [48.720] ms
+    Wrote image file mandelbrot-ispc.ppm
+                                    (2.90x speedup from ISPC)
+    ```
 
-*The expected speedup is 8x, but the payload is different for each pixel, causing the limited performance. The calculation of `view 1` is more centered than `view 2`, so ispc works better.*
+    *The expected speedup is 8x, but the payload is different for each pixel, causing the limited performance. The calculation of `view 1` is more centered than `view 2`, so ispc works better.*
 
   We remind you that for the code described in this subsection, the ISPC
   compiler maps gangs of program instances to SIMD instructions executed
@@ -444,17 +446,17 @@ different CPU cores).
   observe on view 1? What is the speedup over the version of `mandelbrot_ispc` that
   does not partition that computation into tasks?
 
-```
-./mandelbrot_ispc --view 1 --tasks
-[mandelbrot serial]:            [289.897] ms
-Wrote image file mandelbrot-serial.ppm
-[mandelbrot ispc]:              [81.927] ms
-Wrote image file mandelbrot-ispc.ppm
-[mandelbrot multicore ispc]:    [46.272] ms
-Wrote image file mandelbrot-task-ispc.ppm
-                                (3.54x speedup from ISPC)
-                                (6.27x speedup from task ISPC)
-```
+    ```
+    ./mandelbrot_ispc --view 1 --tasks
+    [mandelbrot serial]:            [289.897] ms
+    Wrote image file mandelbrot-serial.ppm
+    [mandelbrot ispc]:              [81.927] ms
+    Wrote image file mandelbrot-ispc.ppm
+    [mandelbrot multicore ispc]:    [46.272] ms
+    Wrote image file mandelbrot-task-ispc.ppm
+                                    (3.54x speedup from ISPC)
+                                    (6.27x speedup from task ISPC)
+    ```
 
 2.  There is a simple way to improve the performance of
   `mandelbrot_ispc --tasks` by changing the number of tasks the code
@@ -464,19 +466,19 @@ Wrote image file mandelbrot-task-ispc.ppm
   How did you determine how many tasks to create? Why does the
   number you chose work best?
 
-```
-./mandelbrot_ispc --view 1 --tasks
-[mandelbrot serial]:            [267.328] ms
-Wrote image file mandelbrot-serial.ppm
-[mandelbrot ispc]:              [75.508] ms
-Wrote image file mandelbrot-ispc.ppm
-[mandelbrot multicore ispc]:    [16.370] ms
-Wrote image file mandelbrot-task-ispc.ppm
-                                (3.54x speedup from ISPC)
-                                (16.33x speedup from task ISPC)
-```
+    ```
+    ./mandelbrot_ispc --view 1 --tasks
+    [mandelbrot serial]:            [267.328] ms
+    Wrote image file mandelbrot-serial.ppm
+    [mandelbrot ispc]:              [75.508] ms
+    Wrote image file mandelbrot-ispc.ppm
+    [mandelbrot multicore ispc]:    [16.370] ms
+    Wrote image file mandelbrot-task-ispc.ppm
+                                    (3.54x speedup from ISPC)
+                                    (16.33x speedup from task ISPC)
+    ```
 
-*I choose 16 tasks, because there are 16 cores in my computer.*
+    *I choose 16 tasks, because there are 16 cores in my computer.*
 
 3.  _Extra Credit: (2 points)_ What are differences between the thread
   abstraction (used in Program 1) and the ISPC task abstraction? There
@@ -487,7 +489,7 @@ Wrote image file mandelbrot-task-ispc.ppm
   10,000 threads? (For this thought experiment, please discuss in the general case
   - i.e. don't tie your discussion to this given mandelbrot program.)
 
-*The compiler can arrange the worklad of each task dynamically, and all of tasks are in a task pool. But threads are arranged statically by programmers. There are a lot of wasted time of creating and joining threads, and the workload is imbalanced.*
+    *The compiler can arrange the worklad of each task dynamically, and all of tasks are in a task pool. But threads are arranged statically by programmers. There are a lot of wasted time of creating and joining threads, and the workload is imbalanced.*
 
 _The smart-thinking student's question_: Hey wait! Why are there two different
 mechanisms (`foreach` and `launch`) for expressing independent, parallelizable
@@ -519,11 +521,48 @@ Note: This problem is a review to double-check your understanding, as it covers 
   single CPU core (no tasks) and when using all cores (with tasks). What 
   is the speedup due to SIMD parallelization? What is the speedup due to 
   multi-core parallelization?
+
+    ```
+    ./sqrt
+    [sqrt serial]:          [3959.678] ms
+    [sqrt ispc]:            [1003.667] ms
+    [sqrt task ispc]:       [112.243] ms
+                                    (3.95x speedup from ISPC)
+                                    (35.28x speedup from task ISPC)
+    ```
+
 2.  Modify the contents of the array values to improve the relative speedup 
   of the ISPC implementations. Construct a specifc input that __maximizes speedup over the sequential version of the code__ and report the resulting speedup achieved (for both the with- and without-tasks ISPC implementations). Does your modification improve SIMD speedup?
   Does it improve multi-core speedup (i.e., the benefit of moving from ISPC without-tasks to ISPC with tasks)? Please explain why.
+
+    ```
+    ./sqrt
+    [sqrt serial]:          [5215.435] ms
+    [sqrt ispc]:            [926.050] ms
+    [sqrt task ispc]:       [116.172] ms
+                                    (5.63x speedup from ISPC)
+                                    (44.89x speedup from task ISPC)
+    ```
+
+    `values[i] = 2.998f + 0.001f * static_cast<float>(rand()) / RAND_MAX;`
+
+    *I don't think `values[i] = 2.998f` is correct. If you do that, you'll find `[sqrt serial]` is smaller than the original `values`, because of [Automatic Vectorization](https://www.intel.com/content/www/us/en/docs/cpp-compiler/developer-guide-reference/2021-8/automatic-vectorization.html).*
+
+
 3.  Construct a specific input for `sqrt` that __minimizes speedup for ISPC (without-tasks) over the sequential version of the code__. Describe this input, describe why you chose it, and report the resulting relative performance of the ISPC implementations. What is the reason for the loss in efficiency? 
     __(keep in mind we are using the `--target=avx2` option for ISPC, which generates 8-wide SIMD instructions)__. 
+
+    ```
+    ./sqrt
+    [sqrt serial]:          [887.387] ms
+    [sqrt ispc]:            [1432.017] ms
+    [sqrt task ispc]:       [186.517] ms
+                                    (0.62x speedup from ISPC)
+                                    (4.76x speedup from task ISPC)
+    ```
+
+    `values[i] = (i % 8) ? 1.0f : 2.998f;`
+
 4.  _Extra Credit: (up to 2 points)_ Write your own version of the `sqrt` 
  function manually using AVX2 intrinsics. To get credit your 
     implementation should be nearly as fast (or faster) than the binary 
