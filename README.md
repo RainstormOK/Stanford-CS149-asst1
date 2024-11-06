@@ -394,6 +394,26 @@ the foreach loop to yield a more straightforward implementation.
   execution? Comparing the performance of rendering the different views
   of the Mandelbrot set may help confirm your hypothesis.).  
 
+```
+./mandelbrot_ispc --view 1
+[mandelbrot serial]:            [617.504] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [175.256] ms
+Wrote image file mandelbrot-ispc.ppm
+                                (3.52x speedup from ISPC)
+```
+
+```
+./mandelbrot_ispc --view 2
+[mandelbrot serial]:            [141.241] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [48.720] ms
+Wrote image file mandelbrot-ispc.ppm
+                                (2.90x speedup from ISPC)
+```
+
+*The expected speedup is 8x, but the payload is different for each pixel, causing the limited performance. The calculation of `view 1` is more centered than `view 2`, so ispc works better.*
+
   We remind you that for the code described in this subsection, the ISPC
   compiler maps gangs of program instances to SIMD instructions executed
   on a single core. This parallelization scheme differs from that of
@@ -423,6 +443,19 @@ different CPU cores).
 1.  Run `mandelbrot_ispc` with the parameter `--tasks`. What speedup do you
   observe on view 1? What is the speedup over the version of `mandelbrot_ispc` that
   does not partition that computation into tasks?
+
+```
+./mandelbrot_ispc --view 1 --tasks
+[mandelbrot serial]:            [289.897] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [81.927] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [46.272] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.54x speedup from ISPC)
+                                (6.27x speedup from task ISPC)
+```
+
 2.  There is a simple way to improve the performance of
   `mandelbrot_ispc --tasks` by changing the number of tasks the code
   creates. By only changing code in the function
@@ -430,6 +463,21 @@ different CPU cores).
   performance that exceeds the sequential version of the code by over 32 times!
   How did you determine how many tasks to create? Why does the
   number you chose work best?
+
+```
+./mandelbrot_ispc --view 1 --tasks
+[mandelbrot serial]:            [267.328] ms
+Wrote image file mandelbrot-serial.ppm
+[mandelbrot ispc]:              [75.508] ms
+Wrote image file mandelbrot-ispc.ppm
+[mandelbrot multicore ispc]:    [16.370] ms
+Wrote image file mandelbrot-task-ispc.ppm
+                                (3.54x speedup from ISPC)
+                                (16.33x speedup from task ISPC)
+```
+
+*I choose 16 tasks, because there are 16 cores in my computer.*
+
 3.  _Extra Credit: (2 points)_ What are differences between the thread
   abstraction (used in Program 1) and the ISPC task abstraction? There
   are some obvious differences in semantics between the (create/join
@@ -438,6 +486,8 @@ different CPU cores).
   happens when you launch 10,000 ISPC tasks? What happens when you launch
   10,000 threads? (For this thought experiment, please discuss in the general case
   - i.e. don't tie your discussion to this given mandelbrot program.)
+
+*The compiler can arrange the worklad of each task dynamically, and all of tasks are in a task pool. But threads are arranged statically by programmers. There are a lot of wasted time of creating and joining threads, and the workload is imbalanced.*
 
 _The smart-thinking student's question_: Hey wait! Why are there two different
 mechanisms (`foreach` and `launch`) for expressing independent, parallelizable
