@@ -610,7 +610,7 @@ elements used. `saxpy` is a *trivially parallelizable computation* and features 
                                     (1.53x speedup from use of tasks)
     ```
 
-    *Now I can only increase Gbps by optimize cache hit.*
+    *Now I can only increase Gbps by optimizing cache hit.*
 
 Notes: Some students have gotten hung up on this question (thinking too hard) in the past. We expect a simple answer, but the results from running this problem might trigger more questions in your head.  Feel encouraged to come talk to the staff.
 
