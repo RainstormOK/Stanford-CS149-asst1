@@ -38,19 +38,19 @@ int main() {
     float scale = 2.f;
 
     float* arrayX = new float[N];
-    float* arrayY = new float[N];
-    float* resultSerial = new float[N];
-    float* resultISPC = new float[N];
-    float* resultTasks = new float[N];
+    float* arrayY = new float[N * 2];
+    float* resultSerial = new float[N * 3];
+    float* resultISPC = new float[N * 3];
+    float* resultTasks = new float[N * 3];
 
     // initialize array values
     for (unsigned int i=0; i<N; i++)
     {
         arrayX[i] = i;
-        arrayY[i] = i;
-        resultSerial[i] = 0.f;
-        resultISPC[i] = 0.f;
-        resultTasks[i] = 0.f;
+        arrayY[i + N] = i;
+        resultSerial[i + 2 * N] = 0.f;
+        resultISPC[i + 2 * N] = 0.f;
+        resultTasks[i + 2 * N] = 0.f;
     }
 
     //
@@ -60,7 +60,7 @@ int main() {
     double minSerial = 1e30;
     for (int i = 0; i < 3; ++i) {
         double startTime =CycleTimer::currentSeconds();
-        saxpySerial(N, scale, arrayX, arrayY, resultSerial);
+        saxpySerial(N, scale, arrayX, arrayY + N, resultSerial + 2 * N);
         double endTime = CycleTimer::currentSeconds();
         minSerial = std::min(minSerial, endTime - startTime);
     }
@@ -76,12 +76,12 @@ int main() {
     double minISPC = 1e30;
     for (int i = 0; i < 3; ++i) {
         double startTime = CycleTimer::currentSeconds();
-        saxpy_ispc(N, scale, arrayX, arrayY, resultISPC);
+        saxpy_ispc(N, scale, arrayX, arrayY + N, resultISPC + 2 * N);
         double endTime = CycleTimer::currentSeconds();
         minISPC = std::min(minISPC, endTime - startTime);
     }
 
-    verifyResult(N, resultISPC, resultSerial);
+    verifyResult(N, resultISPC + 2 * N, resultSerial + 2 * N);
 
     printf("[saxpy ispc]:\t\t[%.3f] ms\t[%.3f] GB/s\t[%.3f] GFLOPS\n",
            minISPC * 1000,
@@ -94,12 +94,12 @@ int main() {
     double minTaskISPC = 1e30;
     for (int i = 0; i < 3; ++i) {
         double startTime = CycleTimer::currentSeconds();
-        saxpy_ispc_withtasks(N, scale, arrayX, arrayY, resultTasks);
+        saxpy_ispc_withtasks(N, scale, arrayX, arrayY + N, resultTasks + 2 * N);
         double endTime = CycleTimer::currentSeconds();
         minTaskISPC = std::min(minTaskISPC, endTime - startTime);
     }
 
-    verifyResult(N, resultTasks, resultSerial);
+    verifyResult(N, resultTasks + 2 * N, resultSerial + 2 * N);
 
     printf("[saxpy task ispc]:\t[%.3f] ms\t[%.3f] GB/s\t[%.3f] GFLOPS\n",
            minTaskISPC * 1000,
